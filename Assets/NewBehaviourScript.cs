@@ -129,9 +129,9 @@ public class NewBehaviourScript : MonoBehaviour
         pos = t.transform.localToWorldMatrix * pos;
 
         Vector3 wpos = t.TransformPoint(mesh.vertices[0]);
-        Vector3 w2screenPoint = camera.WorldToScreenPoint(pos);
-        Vector3 w2viewPort = camera.WorldToViewportPoint(pos);
-        
+        Vector3 w2screenPoint = camera.WorldToScreenPoint(pos); //Z的位置是以世界单位衡量的到 相机 的距离。
+        Vector3 w2viewPort = camera.WorldToViewportPoint(pos); //Z的位置是以世界单位衡量的到 相机 的距离。
+
         //打印世界坐标
         GUI.TextField(new Rect(startX + 9 * colSpace, startY + 2 * rowSpace, width * 4, height), "世界坐标 : " + pos.ToString());
 
