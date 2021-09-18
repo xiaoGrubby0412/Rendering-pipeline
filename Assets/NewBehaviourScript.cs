@@ -41,7 +41,6 @@ public class NewBehaviourScript : MonoBehaviour
 
         }
 
-
     }
 
     private void OnDrawGizmos()
@@ -70,6 +69,7 @@ public class NewBehaviourScript : MonoBehaviour
 
 
         //Gizmos.DrawRay(Vector3.zero, temp);
+
     }
 
     private const float startX = 20;
@@ -79,6 +79,8 @@ public class NewBehaviourScript : MonoBehaviour
     private const float height = 20;
     private const float rowSpace = 20;
     private const float colSpace = 50;
+
+    private Vector3 mousePos = Vector3.zero;
 
     private void OnGUI()
     {
@@ -134,10 +136,23 @@ public class NewBehaviourScript : MonoBehaviour
         //打印齐次坐标
         GUI.TextField(new Rect(startX + 9 * colSpace, startY + 4 * rowSpace, width * 4, height), "齐次坐标 : " + pos.ToString());
 
+        float screenX = (pos.x * Screen.width) / (2 * pos.w) + Screen.width / 2;
+        float screenY = (pos.y * Screen.height) / (2 * pos.w) + Screen.height / 2;
+        //打印屏幕坐标
+        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 5 * rowSpace, width * 4, height), "屏幕坐标 x : " + screenX + " y : " + screenY);
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            mousePos = Input.mousePosition;
+        }
+
+        //打印点击坐标
+        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 6 * rowSpace, width * 4, height), "点击坐标 : " + mousePos.ToString());
+
         //归一化齐次坐标
         pos = new Vector4(pos.x / pos.w, pos.y / pos.w, pos.z / pos.w, pos.w / pos.w);
         //打印归一化齐次坐标
-        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 5 * rowSpace, width * 4, height), "归一齐次 : " + pos.ToString());
+        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 7 * rowSpace, width * 4, height), "归一齐次 : " + pos.ToString());
 
     }
 }
