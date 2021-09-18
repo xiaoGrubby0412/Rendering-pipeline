@@ -41,6 +41,10 @@ public class NewBehaviourScript : MonoBehaviour
 
         }
 
+        if (Input.GetMouseButtonDown(0))
+        {
+            mousePos = Input.mousePosition;
+        }
     }
 
     private void OnDrawGizmos()
@@ -69,7 +73,7 @@ public class NewBehaviourScript : MonoBehaviour
 
 
         //Gizmos.DrawRay(Vector3.zero, temp);
-
+       
     }
 
     private const float startX = 20;
@@ -123,6 +127,11 @@ public class NewBehaviourScript : MonoBehaviour
 
         //模型坐标转换为世界坐标
         pos = t.transform.localToWorldMatrix * pos;
+
+        Vector3 wpos = t.TransformPoint(mesh.vertices[0]);
+        Vector3 w2screenPoint = camera.WorldToScreenPoint(pos);
+        Vector3 w2viewPort = camera.WorldToViewportPoint(pos);
+        
         //打印世界坐标
         GUI.TextField(new Rect(startX + 9 * colSpace, startY + 2 * rowSpace, width * 4, height), "世界坐标 : " + pos.ToString());
 
@@ -138,13 +147,12 @@ public class NewBehaviourScript : MonoBehaviour
 
         float screenX = (pos.x * Screen.width) / (2 * pos.w) + Screen.width / 2;
         float screenY = (pos.y * Screen.height) / (2 * pos.w) + Screen.height / 2;
+
+        float fx = screenX / Screen.width; //这个就是 viewPort 坐标 x
+        float fy = screenY / Screen.height;//这个就是 viewPort 坐标 y
+
         //打印屏幕坐标
         GUI.TextField(new Rect(startX + 9 * colSpace, startY + 5 * rowSpace, width * 4, height), "屏幕坐标 x : " + screenX + " y : " + screenY);
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            mousePos = Input.mousePosition;
-        }
 
         //打印点击坐标
         GUI.TextField(new Rect(startX + 9 * colSpace, startY + 6 * rowSpace, width * 4, height), "点击坐标 : " + mousePos.ToString());
@@ -154,5 +162,6 @@ public class NewBehaviourScript : MonoBehaviour
         //打印归一化齐次坐标
         GUI.TextField(new Rect(startX + 9 * colSpace, startY + 7 * rowSpace, width * 4, height), "归一齐次 : " + pos.ToString());
 
+        
     }
 }
