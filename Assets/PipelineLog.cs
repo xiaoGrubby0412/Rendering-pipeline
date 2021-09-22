@@ -123,45 +123,53 @@ public class PipelineLog : MonoBehaviour
         //获取模型坐标
         Vector4 pos = new Vector4(mesh.vertices[0].x, mesh.vertices[0].y, mesh.vertices[0].z, 1);
         //打印模型坐标
-        GUI.TextField(new Rect(startX + 9 * colSpace, startY + rowSpace, width * 4, height), "模型坐标 : " + pos.ToString());
+        GUI.TextField(new Rect(startX + 9 * colSpace, startY + rowSpace, width * 5, height), "模型坐标 : " + pos.ToString());
 
         //模型坐标转换为世界坐标
         pos = t.transform.localToWorldMatrix * pos;
 
-        Vector3 wpos = t.TransformPoint(mesh.vertices[0]);
-        Vector3 w2screenPoint = camera.WorldToScreenPoint(pos); //Z的位置是以世界单位衡量的到 相机 的距离。
-        Vector3 w2viewPort = camera.WorldToViewportPoint(pos); //Z的位置是以世界单位衡量的到 相机 的距离。
-
         //打印世界坐标
-        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 2 * rowSpace, width * 4, height), "世界坐标 : " + pos.ToString());
+        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 2 * rowSpace, width * 5, height), "世界坐标 : " + pos.ToString());
 
         //世界坐标转换为相机坐标
         pos = camera.worldToCameraMatrix * pos;
         //打印相机坐标
-        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 3 * rowSpace, width * 4, height), "相机坐标 : " + pos.ToString());
+        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 3 * rowSpace, width * 5, height), "相机坐标 : " + pos.ToString());
 
         //乘以投影矩阵 变为齐次坐标
         pos = camera.projectionMatrix * pos;
         //打印齐次坐标
-        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 4 * rowSpace, width * 4, height), "齐次坐标 : " + pos.ToString());
-
-        float screenX = (pos.x * Screen.width) / (2 * pos.w) + Screen.width / 2;
-        float screenY = (pos.y * Screen.height) / (2 * pos.w) + Screen.height / 2;
-
-        float fx = screenX / Screen.width; //这个就是 viewPort 坐标 x
-        float fy = screenY / Screen.height;//这个就是 viewPort 坐标 y
-
-        //打印屏幕坐标
-        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 5 * rowSpace, width * 4, height), "屏幕坐标 x : " + screenX + " y : " + screenY);
-
-        //打印点击坐标
-        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 6 * rowSpace, width * 4, height), "点击坐标 : " + mousePos.ToString());
+        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 4 * rowSpace, width * 5, height), "齐次坐标 : " + pos.ToString());
 
         //归一化齐次坐标
         pos = new Vector4(pos.x / pos.w, pos.y / pos.w, pos.z / pos.w, pos.w / pos.w);
         //打印归一化齐次坐标
-        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 7 * rowSpace, width * 4, height), "归一齐次 : " + pos.ToString());
+        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 5 * rowSpace, width * 5, height), "归一齐次 : " + pos.ToString());
 
-        
+        float viewPortX = pos.x * 0.5f + 0.5f; //这个就是 viewPort 坐标 x
+        float viewPortY = pos.y * 0.5f + 0.5f; //这个就是 viewPort 坐标 y
+
+        //打印视口坐标
+        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 6 * rowSpace, width * 5, height), "视口坐标 x : " + viewPortX + " y : " + viewPortY);
+
+        float screenX = viewPortX * Screen.width; // 屏幕像素坐标 X
+        float screenY = viewPortY * Screen.height; // 屏幕像素坐标 Y
+
+        //打印屏幕坐标
+        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 7 * rowSpace, width * 5, height), "屏幕坐标 x : " + screenX + " y : " + screenY);
+
+        //打印点击坐标
+        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 8 * rowSpace, width * 5, height), "点击坐标 : " + mousePos.ToString());
+
+        Vector3 wpos = t.TransformPoint(mesh.vertices[0]);
+        Vector3 w2screenPoint = camera.WorldToScreenPoint(wpos); //Z的位置是以世界单位衡量的到 相机 的距离。
+        Vector3 w2viewPort = camera.WorldToViewportPoint(wpos); //Z的位置是以世界单位衡量的到 相机 的距离。
+
+        //相机变换的视口坐标
+        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 10 * rowSpace, width * 6, height), "相机变换视口坐标 x : " + w2viewPort.x + " y : " + w2viewPort.y);
+
+        //相机变换的屏幕坐标
+        GUI.TextField(new Rect(startX + 9 * colSpace, startY + 9 * rowSpace, width * 6, height), "相机变换屏幕坐标 x : " + w2screenPoint.x + " y : " + w2screenPoint.y);
+
     }
 }
