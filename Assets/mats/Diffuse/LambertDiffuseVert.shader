@@ -44,7 +44,7 @@ Shader "Unlit/WM/DiffuseVert"
                 v2f f;
                 f.pos = UnityObjectToClipPos(v.vertex);
                 fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz; //环境光
-                fixed normalDir = normalize(mul(v.normal, (float3x3)unity_WorldToObject)); 
+                fixed3 normalDir = normalize(mul(v.normal, (float3x3)unity_WorldToObject)); 
                 fixed3 lightDir = normalize(_WorldSpaceLightPos0.xyz); //获取光源
                 fixed3 diffuse = _LightColor0 * max(0, dot(normalDir, lightDir)) * _Diffuse;
                              

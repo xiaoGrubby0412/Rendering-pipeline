@@ -41,13 +41,13 @@ Shader "Custom/04-Diffuse Vertex" { // 逐顶点漫反射
                 fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.rgb;
 
                 // 法线方向。把法线方向从模型空间转换到世界空间
-                fixed normalDir = normalize(mul(v.normal, (float3x3)unity_WorldToObject)); // 反过来相乘就是从模型到世界，否则是从世界到模型
+                fixed3 normalDir = normalize(mul(v.normal, (float3x3)unity_WorldToObject)); // 反过来相乘就是从模型到世界，否则是从世界到模型
                 // 光照方向
                 fixed3 lightDir = normalize(_WorldSpaceLightPos0.xyz); // 对于每个顶点来说，光的位置就是光的方向，因为光是平行光
                 // 漫反射Diffuse颜色 = 直射光颜色 * max(0, cos(光源方向和法线方向夹角)) * 材质自身色彩
                 fixed3 diffuse = _LightColor0 * max(0, dot(normalDir, lightDir)) * _Diffuse; // 融合材质自身色彩用乘法
                 // 加上环境光
-                f.color = diffuse + ambient; // 颜色叠加用加法（通常亮度会增加）
+                f.color = diffuse; // 颜色叠加用加法（通常亮度会增加）
 
 
                 return f;
