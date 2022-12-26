@@ -48,7 +48,7 @@ Shader "Unlit/WM/DiffuseVert"
                 fixed3 lightDir = normalize(_WorldSpaceLightPos0.xyz); //获取光源
                 fixed3 diffuse = _LightColor0 * max(0, dot(normalDir, lightDir)) * _Diffuse;
                              
-                f.color = diffuse;
+                f.color = diffuse + ambient;
                 return f;
             }
 

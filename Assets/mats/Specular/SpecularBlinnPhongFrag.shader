@@ -17,7 +17,6 @@ Shader "Unlit/WM/SpecularBlinnPhongFrag"
       
     SubShader
     {
-        //顶点插值 漫反射
         Pass
         {
             Tags { "LightMode" = "ForwardBase" }
@@ -50,8 +49,8 @@ Shader "Unlit/WM/SpecularBlinnPhongFrag"
             {
                 v2f f;
                 f.pos = UnityObjectToClipPos(v.vertex);
+                f.worldPos = mul(unity_ObjectToWorld, v.vertex); //计算该顶点的世界坐标
                 f.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject); //计算世界法线
-                f.worldPos = mul((float3x3)unity_ObjectToWorld, v.vertex); //计算该顶点的世界坐标
                 return f;
             }
 

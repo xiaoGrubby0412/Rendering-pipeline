@@ -1,12 +1,4 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
-// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
-
-// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
-
-// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
-
-Shader "Unlit/WM/SpecularFrag"
+﻿Shader "Unlit/WM/SpecularFrag"
 {
     Properties
     {
@@ -36,14 +28,14 @@ Shader "Unlit/WM/SpecularFrag"
             struct a2v
             {
                 float4 vertex : POSITION;
-                float3 normal : NORMAL;
+                fixed3 normal : NORMAL;
             };
 
             struct v2f
             {
                 float4 pos : SV_POSITION;
-                fixed3 worldNormal : TEXCOORD0;
-                fixed3 worldPos : TEXCOORD1;
+                fixed3 worldPos : TEXCOORD0;
+                fixed3 worldNormal : TEXCOORD1;
             };
 
             v2f vert (a2v v)
@@ -51,7 +43,7 @@ Shader "Unlit/WM/SpecularFrag"
                 v2f f;
                 f.pos = UnityObjectToClipPos(v.vertex);
                 f.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject);
-                f.worldPos = mul((float3x3)unity_ObjectToWorld, v.vertex);
+                f.worldPos = mul(unity_ObjectToWorld, v.vertex);
                 return f;
             }
 
@@ -61,7 +53,7 @@ Shader "Unlit/WM/SpecularFrag"
                 fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz; //环境光
                 fixed3 normalDir = normalize(i.worldNormal); 
                 fixed3 lightDir = normalize(_WorldSpaceLightPos0.xyz); //获取光源
-                fixed3 diffuse = _LightColor0 * max(0, dot(normalDir, lightDir)) * _Diffuse; //获得漫反射颜色强度
+                fixed3 diffuse = _LightColor0.rgb * saturate(dot(normalDir, lightDir)) * _Diffuse.rgb; //获得漫反射颜色强度
                 
                 //获取反射方向
                 fixed3 reflectDir = normalize(reflect(-lightDir, normalDir)); 
