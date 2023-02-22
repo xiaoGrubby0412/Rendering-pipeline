@@ -9,6 +9,10 @@ Shader "UnityShaderBook/Chapter9/ForwardRendering"
 
     SubShader
     {
+        Tags
+        {
+            "RenderType" = "Opaque"
+        }
         Pass
         {
             Tags
@@ -17,12 +21,13 @@ Shader "UnityShaderBook/Chapter9/ForwardRendering"
             }
 
             CGPROGRAM
-            #include "Lighting.cginc"
-            #include "AutoLight.cginc"
+            #pragma multi_compile_fwdbase
 
             #pragma vertex vert
             #pragma fragment frag
-            #pragma multi_compile_fwdbase
+
+            #include "Lighting.cginc"
+            #include "AutoLight.cginc"
 
             float3 _Diffuse;
             float3 _Specular;
@@ -41,26 +46,37 @@ Shader "UnityShaderBook/Chapter9/ForwardRendering"
                 float3 worldNormal : TEXCOORD1;
             };
 
-            v2f vert(a2v o)
+            v2f vert(a2v v)
             {
-                v2f v;
-                v.pos = UnityObjectToClipPos(o.vertex);
-                v.worldPos = mul(unity_ObjectToWorld, o.vertex);
-                v.worldNormal = UnityObjectToWorldNormal(o.normal);
-                return v;
+                // v2f o;
+                // o.pos = UnityObjectToClipPos(v.vertex);
+                // o.worldPos = mul(unity_ObjectToWorld, v.vertex);
+                // o.worldNormal = UnityObjectToWorldNormal(v.normal);
+                // return o;
+
+                v2f o;
+                o.pos = UnityObjectToClipPos(v.vertex);
+
+                o.worldNormal = UnityObjectToWorldNormal(v.normal);
+
+                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+
+                return o;
             }
 
-            fixed4 frag(v2f v) : SV_Target
+            fixed4 frag(v2f i) : SV_Target
             {
-                float3 worldNormal = normalize(v.worldNormal);
+                float3 worldNormal = normalize(i.worldNormal);
                 float3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
-                float3 worldViewDir = normalize(UnityWorldSpaceViewDir(v.worldPos));
+                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
+
+                float3 worldViewDir = normalize(UnityWorldSpaceViewDir(i.worldPos));
                 float3 halfDir = normalize(worldLightDir + worldViewDir);
 
-                float3 diffuse = _LightColor0.rgb * _Diffuse.rgb * dot(worldNormal, worldLightDir) * 0.5 + 0.5;
+                float3 diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLightDir));
                 float3 specular = _LightColor0.rgb * _Specular.rgb * pow(saturate(dot(halfDir, worldNormal)), _Gloss);
 
-                return fixed4(diffuse.rgb + specular.rgb, 1);
+                return fixed4(ambient + diffuse.rgb + specular.rgb, 1);
             }
             ENDCG
         }
@@ -69,22 +85,22 @@ Shader "UnityShaderBook/Chapter9/ForwardRendering"
         {
             Tags
             {
-                "LightMode" = "ForwardAdd" "Queue" = "Geometry"
+                "LightMode"="ForwardAdd"
             }
-            
-            Blend one one
-            
+
+            Blend One One
+
             CGPROGRAM
+            #pragma multi_compile_fwdadd
+
+            #pragma vertex vert
+            #pragma fragment frag
 
             #include "Lighting.cginc"
             #include "AutoLight.cginc"
 
-            #pragma vertex vert
-            #pragma fragment frag
-            #pragma  multi_compile_fwdadd
-
-            float3 _Diffuse;
-            float3 _Specular;
+            fixed4 _Diffuse;
+            fixed4 _Specular;
             float _Gloss;
 
             struct a2v
@@ -96,23 +112,60 @@ Shader "UnityShaderBook/Chapter9/ForwardRendering"
             struct v2f
             {
                 float4 pos : SV_POSITION;
-                float3 worldPos : TEXCOORD0;
-                float3 worldNormal : TEXCOORD1;
+                float3 worldNormal : TEXCOORD0;
+                float3 worldPos : TEXCOORD1;
             };
 
-            v2f vert(a2v o)
+            v2f vert(a2v v)
             {
-                v2f v;
-                v.pos = UnityObjectToClipPos()
+                v2f o;
+                o.pos = UnityObjectToClipPos(v.vertex);
+
+                o.worldNormal = UnityObjectToWorldNormal(v.normal);
+
+                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+
+                return o;
             }
-            
-            
+
+
+            fixed4 frag(v2f i) : SV_Target
+            {
+                fixed3 worldNormal = normalize(i.worldNormal);
+				#ifdef USING_DIRECTIONAL_LIGHT
+					fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
+				#else
+					fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz - i.worldPos.xyz);
+				#endif
+				
+				fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * max(0, dot(worldNormal, worldLightDir));
+                
+                fixed3 worldViewDir = normalize(UnityWorldSpaceViewDir(i.worldPos));
+                fixed3 halfDir = normalize(worldViewDir + worldLightDir);
+
+                
+                fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(saturate(dot(worldNormal, halfDir)), _Gloss);
+
+                #ifdef USING_DIRECTIONAL_LIGHT
+                    fixed atten = 1.0;
+                #else
+                #if defined(POINT)
+                        float3 lightCoord = mul(unity_WorldToLight, float4(i.worldPos, 1)).xyz;
+                        fixed atten = tex2D(_LightTexture0, dot(lightCoord, lightCoord).rr).UNITY_ATTEN_CHANNEL;
+                #elif defined(SPOT)
+                        float4 lightCoord = mul(unity_WorldToLight, float4(i.worldPos, 1));
+                        fixed atten = (lightCoord.z > 0) * tex2D(_LightTexture0, lightCoord.xy / lightCoord.w + 0.5).w * tex2D(_LightTextureB0, dot(lightCoord, lightCoord).rr).UNITY_ATTEN_CHANNEL;
+                #else
+                fixed atten = 1.0;
+                #endif
+                #endif
+
+                return fixed4((diffuse + specular) * atten, 1);
+            }
             ENDCG
-
-
         }
 
     }
 
-    Fallback "Diffuse"
+    Fallback "Specular"
 }
