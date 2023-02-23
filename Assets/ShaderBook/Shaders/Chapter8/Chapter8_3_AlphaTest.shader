@@ -21,8 +21,8 @@ Shader "UnityShaderBook/Chapter8_3_AlphaTest"
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
 
-            #pragma vertex vert;
-            #pragma fragment frag;
+            #pragma vertex vert
+            #pragma fragment frag
 
             sampler2D _MainTex;
             float4 _MainTex_ST;

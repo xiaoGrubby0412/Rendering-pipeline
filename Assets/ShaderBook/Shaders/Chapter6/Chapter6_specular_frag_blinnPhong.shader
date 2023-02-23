@@ -23,8 +23,8 @@ Shader "UnityShaderBook/Chapter6_specular_frag_blinnPhong"
             }
             
             CGPROGRAM
-            #pragma vertex vert;
-            #pragma fragment frag;
+            #pragma vertex vert
+            #pragma fragment frag
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"

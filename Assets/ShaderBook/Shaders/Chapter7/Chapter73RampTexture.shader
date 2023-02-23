@@ -22,8 +22,8 @@ Shader "UnityShaderBook/Chapter73RampTexture"
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
 
-            #pragma vertex vert;
-            #pragma fragment frag;
+            #pragma vertex vert
+            #pragma fragment frag
 
             sampler2D _RampTex;
             float4 _RampTex_ST;

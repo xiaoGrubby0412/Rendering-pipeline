@@ -26,8 +26,8 @@ Shader "UnityShaderBook/Chapter6_specular_vert"
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
 
-            #pragma vertex vert;
-            #pragma fragment frag;
+            #pragma vertex vert
+            #pragma fragment frag
 
             struct a2v
             {

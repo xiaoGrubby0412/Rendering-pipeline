@@ -26,8 +26,8 @@ Shader "UnityShaderBook/Chapter6_specular_frag"
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
             
-            #pragma vertex vert;
-            #pragma fragment frag;
+            #pragma vertex vert
+            #pragma fragment frag
 
             fixed4 _Diffuse;
             fixed4 _Specular;
