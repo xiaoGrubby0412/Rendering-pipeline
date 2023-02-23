@@ -4,8 +4,8 @@
     {
         _MainTex("MainTex", 2D) = "white"{}
         _Color("MainColor", Color) = (1,1,1,1)
-//        _Specular("Specular", Color) = (1,1,1,1)
-//        _Gloss("Gloss", Range(20, 100)) = 20
+        _Specular("Specular", Color) = (1,1,1,1)
+        _Gloss("Gloss", Range(20, 100)) = 20
         _Cutoff("CutOut", Range(0, 1)) = 0.5 
     }
 
@@ -26,8 +26,8 @@
             sampler2D _MainTex;
             float4 _MainTex_ST;
             float4 _Color;
-            // float4 _Specular;
-            // float _Gloss;
+            float4 _Specular;
+            float _Gloss;
             float _Cutoff;
 
             #pragma vertex vert
@@ -80,11 +80,15 @@
 				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
 				
 				fixed3 diffuse = _LightColor0.rgb * albedo * max(0, dot(worldNormal, worldLightDir));
+
+            	fixed3 worldViewDir = normalize(UnityWorldSpaceViewDir(i.worldPos));
+            	fixed3 halfDir = normalize((worldViewDir + worldLightDir));
+            	fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(saturate(dot(worldNormal, halfDir)), _Gloss);
 							 	
 			 	// UNITY_LIGHT_ATTENUATION not only compute attenuation, but also shadow infos
 				UNITY_LIGHT_ATTENUATION(atten, i, i.worldPos);
 			 	
-				return fixed4(ambient + diffuse * atten, 1.0);
+				return fixed4(ambient + (diffuse + specular) * atten, 1.0);
             }
             
             
